@@ -29,12 +29,14 @@ const {auth} = useAuthentication()
 const loadingUser = user == undefined
 
 useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("Auth state changed:", user);  // Verifique se isso está sendo chamado
+      setUser(user);  // Atualiza o estado de 'user' com o valor retornado
+    });
 
-  onAuthStateChanged(auth, (user)=> {
-    setUser(user)
-  })
 
-}, [auth])
+    return () => unsubscribe();  // Cleanup do listener ao desmontar o componente
+  }, [auth]);
 
 if(loadingUser){
   return <p>Carregando...</p>;
@@ -51,9 +53,10 @@ if(loadingUser){
                       <Route path="/" element={<Home/>} />
                       <Route path="/about" element={<About/>} />
                       <Route path="/login" element={!user ? <Login/> : <Navigate to= "/"/>} />
-                      <Route path="/register" element={<Register/>} />
+                      <Route path="/register" element={!user ? <Register/> : <Navigate to= "/"/>} />
                       <Route path='/posts/create' element={ user? <CreatePost/>: <Navigate to="/login"/>}/> {/*Essas autenticacoes serve para so deixar que o usuario entre em paginas quando estiver logado*/}
                       <Route path='/dashboard' element={user? <Dashboard/>: <Navigate to="/login"/>}/>
+                      
                     </Routes>
                   </div>
                 <Footer/>
@@ -61,7 +64,7 @@ if(loadingUser){
         </AuthProvider>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

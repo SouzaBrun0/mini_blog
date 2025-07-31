@@ -1,11 +1,16 @@
 import React from 'react'
-
+import { Link } from 'react-router-dom'
+import styles from './about.module.css'
 
 const About = () => {
   return (
-    <div>
-      <h1>About</h1>
-      <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda nihil a autem tenetur, corrupti omnis laudantium sapiente doloribus eligendi non commodi praesentium iusto nemo nesciunt magni. Quisquam aut libero voluptas.</p>
+    <div className={styles.about}>
+        <h2>Sobre o mini <span>Blog</span></h2>
+        <p>Este projeto consiste em um blog feito com React no front end e FireBase no back-end</p>
+   
+        <Link to="/posts/create" className='btn'>
+        Criar Post
+      </Link>
     </div>
   )
 }
