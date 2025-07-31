@@ -7,25 +7,58 @@ import NavBar from './components/NavBar';
 import Footer from './components/Footer';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
+import { onAuthStateChanged } from 'firebase/auth';
+
+import { useState, useEffect } from 'react';
+import { useAuthentication } from './hooks/useAuthentication';
+
+
+//context
+import { AuthProvider } from './context/AuthContext';
+import CreatePost from './CreatePost/CreatePost';
+import Dashboard from './Dashboard/Dashboard';
+
+
+
 
 function App() {
+
+const [user, setUser] = useState(undefined)
+const {auth} = useAuthentication()
+
+const loadingUser = user == undefined
+
+useEffect(() => {
+
+  onAuthStateChanged(auth, (user)=> {
+    setUser(user)
+  })
+
+}, [auth])
+
+if(loadingUser){
+  return <p>Carregando...</p>;
+}
 
   return (
     <>
       <div>
-      <BrowserRouter>
-        <NavBar/>
-          <div className="container">
-            <Routes>
-              <Route path="/" element={<Home/>} />
-              <Route path="/about" element={<About/>} />
-              <Route path="/logn" element={<Login/>} />
-              <Route path="/register" element={<Register/>} />
-
-            </Routes>
-          </div>
-        <Footer/>
-      </BrowserRouter>
+        <AuthProvider value={ {user} }>
+             <BrowserRouter>
+                <NavBar/>
+                  <div className="container">
+                    <Routes>
+                      <Route path="/" element={<Home/>} />
+                      <Route path="/about" element={<About/>} />
+                      <Route path="/login" element={!user ? <Login/> : <Navigate to= "/"/>} />
+                      <Route path="/register" element={<Register/>} />
+                      <Route path='/posts/create' element={ user? <CreatePost/>: <Navigate to="/login"/>}/> {/*Essas autenticacoes serve para so deixar que o usuario entre em paginas quando estiver logado*/}
+                      <Route path='/dashboard' element={user? <Dashboard/>: <Navigate to="/login"/>}/>
+                    </Routes>
+                  </div>
+                <Footer/>
+              </BrowserRouter>
+        </AuthProvider>
       </div>
     </>
   )
